@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Розумна теплиця</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌱</text></svg>">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #f0fdf4;
+            --card-bg: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --accent: #22c55e;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Nunito', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh; /* Займає 100% висоти екрану */
+            padding: 40px 20px 20px;
+        }
+
+        /* Верхня частина */
+        header {
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            color: #14532d;
+            margin-bottom: 15px;
+        }
+
+        .live-badge {
+            display: inline-flex;
+            align-items: center;
+            background: #dcfce7;
+            color: #15803d;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            box-shadow: 0 2px 10px rgba(34, 197, 94, 0.2);
+        }
+
+        .dot {
+            height: 10px;
+            width: 10px;
+            background-color: var(--accent);
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 8px;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(34, 197, 94, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+        }
+
+        /* Центральна частина (розтягується і центрує картки) */
+        main {
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            padding: 40px 0;
+        }
+
+        .dashboard {
+            display: grid;
+            gap: 20px;
+            width: 100%;
+            max-width: 1200px;
+            grid-template-columns: 1fr; 
+        }
+
+        @media (min-width: 600px) {
+            .dashboard { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        @media (min-width: 1000px) {
+            .dashboard { grid-template-columns: repeat(4, 1fr); }
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 20px;
+            padding: 30px 20px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            border: 2px solid transparent;
+        }
+
+        .card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            border-color: #bbf7d0;
+        }
+
+        .icon {
+            font-size: 2.8rem;
+            margin-bottom: 15px;
+            transition: transform 0.3s ease;
+        }
+        
+        .card:hover .icon {
+            transform: scale(1.1);
+        }
+
+        .card-title {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .card-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--accent);
+        }
+
+        .unit {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            font-weight: 600;
+            margin-left: 4px;
+        }
+
+        /* Нижня частина */
+        footer {
+            text-align: center;
+            flex-shrink: 0;
+            padding-top: 20px;
+        }
+
+        .timestamp {
+            display: inline-block;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            background: white;
+            padding: 10px 20px;
+            border-radius: 30px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>🌱 Розумна теплиця</h1>
+        <div class="live-badge">
+            <span class="dot"></span> Система онлайн
+        </div>
+    </header>
+
+    <main>
+        <div class="dashboard" id="dashboard">
+            <div class="card">
+                <div class="icon">🌡️</div>
+                <div class="card-title">Температура повітря</div>
+                <div class="card-value" id="val_temp">--<span class="unit">°C</span></div>
+            </div>
+            <div class="card">
+                <div class="icon">💧</div>
+                <div class="card-title">Вологість повітря</div>
+                <div class="card-value" id="val_hum">--<span class="unit">%</span></div>
+            </div>
+            <div class="card">
+                <div class="icon">🪴</div>
+                <div class="card-title">Вологість ґрунту</div>
+                <div class="card-value" id="val_soil">--<span class="unit">%</span></div>
+            </div>
+            <div class="card">
+                <div class="icon">☀️</div>
+                <div class="card-title">Освітленість</div>
+                <div class="card-value" id="val_light">--<span class="unit">lux</span></div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="timestamp" id="last_update">Очікування даних...</div>
+    </footer>
+
+    <script>
+        async function fetchTelemetry() {
+            try {
+                const response = await fetch('http://localhost:5000/api/telemetry/latest');
+                if (!response.ok) throw new Error("Помилка мережі");
+                
+                const data = await response.json();
+                const m = data.metrics;
+
+                const temp = m.temperature !== undefined ? m.temperature : '--';
+                const hum = m.humidity !== undefined ? m.humidity : '--';
+                const soil = m.soil_moisture !== undefined ? m.soil_moisture : '--';
+                const light = m.light_lux !== undefined ? m.light_lux : '--';
+
+                document.getElementById('val_temp').innerHTML = `${temp}<span class="unit">°C</span>`;
+                document.getElementById('val_hum').innerHTML = `${hum}<span class="unit">%</span>`;
+                document.getElementById('val_soil').innerHTML = `${soil}<span class="unit">%</span>`;
+                document.getElementById('val_light').innerHTML = `${light}<span class="unit">lux</span>`;
+
+                const date = new Date(data.timestamp);
+                document.getElementById('last_update').innerText = `Останнє оновлення: ${date.toLocaleString('uk-UA')}`;
+
+            } catch (error) {
+                console.error('Помилка:', error);
+                document.getElementById('last_update').innerText = '❌ Немає зв\'язку із сервером';
+            }
+        }
+
+        fetchTelemetry();
+        setInterval(fetchTelemetry, 5000);
+    </script>
+
+</body>
+</html>
