@@ -6,195 +6,57 @@
     <title>Розумна теплиця</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌱</text></svg>">
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;800&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --bg-color: #f0fdf4;
-            --card-bg: #ffffff;
-            --text-main: #1e293b;
-            --text-muted: #64748b;
-            --accent: #22c55e;
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Nunito', sans-serif;
-        }
-
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh; /* Займає 100% висоти екрану */
-            padding: 40px 20px 20px;
-        }
-
-        /* Верхня частина */
-        header {
-            text-align: center;
-            flex-shrink: 0;
-        }
-
-        h1 {
-            font-size: 2.5rem;
-            color: #14532d;
-            margin-bottom: 15px;
-        }
-
-        .live-badge {
-            display: inline-flex;
-            align-items: center;
-            background: #dcfce7;
-            color: #15803d;
-            padding: 6px 16px;
-            border-radius: 20px;
-            font-weight: 600;
-            font-size: 0.9rem;
-            box-shadow: 0 2px 10px rgba(34, 197, 94, 0.2);
-        }
-
-        .dot {
-            height: 10px;
-            width: 10px;
-            background-color: var(--accent);
-            border-radius: 50%;
-            display: inline-block;
-            margin-right: 8px;
-            animation: pulse 1.5s infinite;
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); }
-            70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(34, 197, 94, 0); }
-            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
-        }
-
-        /* Центральна частина (розтягується і центрує картки) */
-        main {
-            flex-grow: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 100%;
-            padding: 40px 0;
-        }
-
-        .dashboard {
-            display: grid;
-            gap: 20px;
-            width: 100%;
-            max-width: 1200px;
-            grid-template-columns: 1fr; 
-        }
-
-        @media (min-width: 600px) {
-            .dashboard { grid-template-columns: repeat(2, 1fr); }
-        }
-
-        @media (min-width: 1000px) {
-            .dashboard { grid-template-columns: repeat(4, 1fr); }
-        }
-
-        .card {
-            background-color: var(--card-bg);
-            border-radius: 20px;
-            padding: 30px 20px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-            border: 2px solid transparent;
-        }
-
-        .card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-            border-color: #bbf7d0;
-        }
-
-        .icon {
-            font-size: 2.8rem;
-            margin-bottom: 15px;
-            transition: transform 0.3s ease;
-        }
-        
-        .card:hover .icon {
-            transform: scale(1.1);
-        }
-
-        .card-title {
-            font-size: 1.1rem;
-            color: var(--text-muted);
-            margin-bottom: 15px;
-            font-weight: 600;
-        }
-
-        .card-value {
-            font-size: 2.5rem;
-            font-weight: 800;
-            color: var(--accent);
-        }
-
-        .unit {
-            font-size: 1.2rem;
-            color: var(--text-muted);
-            font-weight: 600;
-            margin-left: 4px;
-        }
-
-        /* Нижня частина */
-        footer {
-            text-align: center;
-            flex-shrink: 0;
-            padding-top: 20px;
-        }
-
-        .timestamp {
-            display: inline-block;
-            color: var(--text-muted);
-            font-size: 0.95rem;
-            background: white;
-            padding: 10px 20px;
-            border-radius: 30px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.02);
-        }
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
     <header>
         <h1>🌱 Розумна теплиця</h1>
-        <div class="live-badge">
-            <span class="dot"></span> Система онлайн
-        </div>
+        <div class="live-badge"><span class="dot"></span> Система онлайн</div>
     </header>
 
     <main>
         <div class="dashboard" id="dashboard">
-            <div class="card">
+            <div class="card" id="card-temp">
                 <div class="icon">🌡️</div>
                 <div class="card-title">Температура повітря</div>
                 <div class="card-value" id="val_temp">--<span class="unit">°C</span></div>
             </div>
-            <div class="card">
+            <div class="card" id="card-hum">
                 <div class="icon">💧</div>
                 <div class="card-title">Вологість повітря</div>
                 <div class="card-value" id="val_hum">--<span class="unit">%</span></div>
             </div>
-            <div class="card">
+            <div class="card" id="card-soil">
                 <div class="icon">🪴</div>
                 <div class="card-title">Вологість ґрунту</div>
                 <div class="card-value" id="val_soil">--<span class="unit">%</span></div>
             </div>
-            <div class="card">
+            <div class="card" id="card-light">
                 <div class="icon">☀️</div>
                 <div class="card-title">Освітленість</div>
                 <div class="card-value" id="val_light">--<span class="unit">lux</span></div>
             </div>
+        </div>
+
+        <div class="controls-panel">
+            <h3>Керування провітрюванням</h3>
+            
+            <button class="btn btn-auto active" id="btn-auto">Авто-режим</button>
+            
+            <hr style="margin: 20px 0; border: 0; border-top: 1px solid #eee;">
+
+            <div class="switch-container disabled-ui" id="manual-controls">
+                <span class="switch-label" id="label-close">Закрито</span>
+                <label class="switch">
+                    <input type="checkbox" id="door-toggle">
+                    <span class="slider"></span>
+                </label>
+                <span class="switch-label" id="label-open">Відкрито</span>
+            </div>
+
+            <br>
+            <a href="history.html" class="btn btn-history">📊 Відкрити графіки та історію</a>
         </div>
     </main>
 
@@ -203,36 +65,97 @@
     </footer>
 
     <script>
+        const btnAuto = document.getElementById('btn-auto');
+        const manualControls = document.getElementById('manual-controls');
+        const doorToggle = document.getElementById('door-toggle');
+        const labelOpen = document.getElementById('label-open');
+        const labelClose = document.getElementById('label-close');
+
+        // 1. Блимання карток при тривозі
+        function checkAlert(cardId, value, min, max = Infinity) {
+            const card = document.getElementById(cardId);
+            if (value !== '--' && (value < min || value > max)) {
+                card.classList.add('alert');
+            } else {
+                card.classList.remove('alert');
+            }
+        }
+
+        // 2. Відправка команд
+        async function sendCommand(mode, command) {
+            try {
+                await fetch('http://localhost:5000/api/command', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ mode, command })
+                });
+            } catch (error) {
+                console.error('Помилка команди:', error);
+            }
+        }
+
+        // 3. Оновлення цифр
         async function fetchTelemetry() {
             try {
                 const response = await fetch('http://localhost:5000/api/telemetry/latest');
                 if (!response.ok) throw new Error("Помилка мережі");
-                
                 const data = await response.json();
-                const m = data.metrics;
 
-                const temp = m.temperature !== undefined ? m.temperature : '--';
-                const hum = m.humidity !== undefined ? m.humidity : '--';
-                const soil = m.soil_moisture !== undefined ? m.soil_moisture : '--';
-                const light = m.light_lux !== undefined ? m.light_lux : '--';
+                const temp = data.temperature !== undefined ? parseFloat(data.temperature).toFixed(1) : '--';
+                const hum = data.humidity !== undefined ? parseFloat(data.humidity).toFixed(1) : '--';
+                const soil = data.soil_moisture !== undefined ? data.soil_moisture : '--';
+                const light = data.light_lux !== undefined ? Math.round(data.light_lux) : '--';
 
                 document.getElementById('val_temp').innerHTML = `${temp}<span class="unit">°C</span>`;
                 document.getElementById('val_hum').innerHTML = `${hum}<span class="unit">%</span>`;
                 document.getElementById('val_soil').innerHTML = `${soil}<span class="unit">%</span>`;
                 document.getElementById('val_light').innerHTML = `${light}<span class="unit">lux</span>`;
 
-                const date = new Date(data.timestamp);
-                document.getElementById('last_update').innerText = `Останнє оновлення: ${date.toLocaleString('uk-UA')}`;
+                checkAlert('card-temp', temp, 15, 30);
+                checkAlert('card-hum', hum, 40, 95);
+                checkAlert('card-soil', soil, 30);
+                checkAlert('card-light', light, 50);
 
-            } catch (error) {
-                console.error('Помилка:', error);
-                document.getElementById('last_update').innerText = '❌ Немає зв\'язку із сервером';
-            }
+                const date = new Date(data.timestamp);
+                document.getElementById('last_update').innerText = `Останнє оновлення: ${date.toLocaleTimeString('uk-UA')}`;
+            } catch (e) { console.error(e); }
         }
+
+        // --- ЛОГІКА КЕРУВАННЯ ---
+
+        // Перехід в АВТО
+        btnAuto.addEventListener('click', () => {
+            btnAuto.classList.add('active');
+            manualControls.classList.add('disabled-ui'); 
+            
+            labelOpen.classList.remove('active');
+            labelClose.classList.remove('active');
+            
+            // В авто-режимі ESP32 сама закриє/відкриє за температурою
+            sendCommand("auto", "close"); 
+        });
+
+        // Взаємодія з ТУМБЛЕРОМ (Ручний режим)
+        doorToggle.addEventListener('change', () => {
+            // Як тільки рухнули тумблер — вимикаємо Авто
+            btnAuto.classList.remove('active');
+            manualControls.classList.remove('disabled-ui');
+
+            const isOpened = doorToggle.checked;
+            
+            if (isOpened) {
+                labelOpen.classList.add('active');
+                labelClose.classList.remove('active');
+                sendCommand("manual", "open");
+            } else {
+                labelOpen.classList.remove('active');
+                labelClose.classList.add('active');
+                sendCommand("manual", "close");
+            }
+        });
 
         fetchTelemetry();
         setInterval(fetchTelemetry, 5000);
     </script>
-
 </body>
 </html>

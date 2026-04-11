@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Звітність | Розумна теплиця</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+    <main style="padding-top: 20px;">
+        <div class="header-history">
+            <a href="index.html" class="btn-back">⬅ Назад</a>
+            <h1>📊 Аналітика (остання година)</h1>
+        </div>
+
+        <div class="averages-panel" id="averages-panel" style="display: none;">
+            <div class="avg-item"><div class="avg-label">Середня t°</div><div class="avg-val" id="avg-temp" style="color: #ef4444;">--°C</div></div>
+            <div class="avg-item"><div class="avg-label">Вологість пов.</div><div class="avg-val" id="avg-hum" style="color: #3b82f6;">--%</div></div>
+            <div class="avg-item"><div class="avg-label">Вологість ґрунту</div><div class="avg-val" id="avg-soil" style="color: #22c55e;">--%</div></div>
+            <div class="avg-item"><div class="avg-label">Освітленість</div><div class="avg-val" id="avg-light" style="color: #eab308;">-- lx</div></div>
+        </div>
+
+        <div id="loading-msg" class="loading-text">Завантаження аналітики... ⏳</div>
+
+        <div class="charts-container" id="charts-container" style="display: none;">
+            <div class="chart-card"><canvas id="tempChart"></canvas></div>
+            <div class="chart-card"><canvas id="humChart"></canvas></div>
+            <div class="chart-card"><canvas id="soilChart"></canvas></div>
+            <div class="chart-card"><canvas id="lightChart"></canvas></div>
+        </div>
+
+        <div class="footer-actions">
+            <button id="download-csv" class="btn-download" style="display: none;">
+                📥 Завантажити повний звіт (CSV)
+            </button>
+        </div>
+    </main>
+
+    <script>
+        let tempChart, humChart, soilChart, lightChart;
+        let lastHistoryData = []; // Сюди зберігатимемо дані для завантаження
+
+        const commonOptions = {
+            responsive: true, maintainAspectRatio: false, tension: 0.4, pointRadius: 3,
+            plugins: { legend: { display: false } },
+            scales: {
+                x: { grid: { display: false }, ticks: { font: { family: 'Nunito' }, maxTicksLimit: 12 } },
+                y: { border: { display: false }, grid: { color: 'rgba(0, 0, 0, 0.05)' } }
+            }
+        };
+
+        async function loadHistory() {
+            try {
+                const response = await fetch('http://localhost:5000/api/telemetry/history');
+                const data = await response.json();
+                if (data.length === 0) {
+                    document.getElementById('loading-msg').innerText = "Даних за останню годину ще немає 📭";
+                    return;
+                }
+
+                lastHistoryData = data; // Зберігаємо для CSV
+                document.getElementById('loading-msg').style.display = 'none';
+                document.getElementById('averages-panel').style.display = 'flex';
+                document.getElementById('charts-container').style.display = 'grid';
+                document.getElementById('download-csv').style.display = 'inline-flex';
+
+                const labels = data.map(d => {
+                    const date = new Date(d.timestamp);
+                    return `${date.getHours()}:${date.getMinutes().toString().padStart(2, '0')}`;
+                });
+                
+                const temps = data.map(d => d.temperature);
+                const hums = data.map(d => d.humidity);
+                const soils = data.map(d => d.soil_moisture);
+                const lights = data.map(d => d.light_lux);
+
+                // Оновлення середніх
+                document.getElementById('avg-temp').innerText = (temps.reduce((a,b)=>a+b,0)/temps.length).toFixed(1) + '°C';
+                document.getElementById('avg-hum').innerText = (hums.reduce((a,b)=>a+b,0)/hums.length).toFixed(1) + '%';
+                document.getElementById('avg-soil').innerText = Math.round(soils.reduce((a,b)=>a+b,0)/soils.length) + '%';
+                document.getElementById('avg-light').innerText = Math.round(lights.reduce((a,b)=>a+b,0)/lights.length) + ' lx';
+
+                if (tempChart) {
+                    tempChart.data.labels = labels; tempChart.data.datasets[0].data = temps; tempChart.update();
+                    humChart.data.labels = labels; humChart.data.datasets[0].data = hums; humChart.update();
+                    soilChart.data.labels = labels; soilChart.data.datasets[0].data = soils; soilChart.update();
+                    lightChart.data.labels = labels; lightChart.data.datasets[0].data = lights; lightChart.update();
+                } else {
+                    const ctxTemp = document.getElementById('tempChart').getContext('2d');
+                    tempChart = new Chart(ctxTemp, { type: 'line', data: { labels: labels, datasets: [{ label: 't°', data: temps, borderColor: '#ef4444', backgroundColor: 'rgba(239, 68, 68, 0.1)', fill: true, ...commonOptions }] }, options: { plugins: { title: { display: true, text: 'Температура за годину (хв/хв)' } } }});
+                    const ctxHum = document.getElementById('humChart').getContext('2d');
+                    humChart = new Chart(ctxHum, { type: 'line', data: { labels: labels, datasets: [{ label: '%', data: hums, borderColor: '#3b82f6', backgroundColor: 'rgba(59, 130, 246, 0.1)', fill: true, ...commonOptions }] }, options: { plugins: { title: { display: true, text: 'Вологість повітря (%)' } } }});
+                    const ctxSoil = document.getElementById('soilChart').getContext('2d');
+                    soilChart = new Chart(ctxSoil, { type: 'line', data: { labels: labels, datasets: [{ label: '%', data: soils, borderColor: '#22c55e', backgroundColor: 'rgba(34, 197, 94, 0.1)', fill: true, ...commonOptions }] }, options: { plugins: { title: { display: true, text: 'Вологість ґрунту (%)' } } }});
+                    const ctxLight = document.getElementById('lightChart').getContext('2d');
+                    lightChart = new Chart(ctxLight, { type: 'line', data: { labels: labels, datasets: [{ label: 'lx', data: lights, borderColor: '#eab308', backgroundColor: 'rgba(234, 179, 8, 0.1)', fill: true, ...commonOptions }] }, options: { plugins: { title: { display: true, text: 'Освітленість (lux)' } } }});
+                }
+            } catch (error) { console.error(error); }
+        }
+
+        // ОНОВЛЕНА ФУНКЦІЯ ЗАВАНТАЖЕННЯ CSV
+        document.getElementById('download-csv').addEventListener('click', () => {
+            if (lastHistoryData.length === 0) return;
+
+            // 1. Додаємо спеціальний символ BOM (\ufeff), щоб Excel зрозумів кирилицю
+            let csvContent = "\ufeff"; 
+            
+            // 2. Використовуємо крапку з комою (;) як роздільник стовпців — так Excel в Україні розуміє краще
+            csvContent += "Дата та час;Температура (°C);Вологість повітря (%);Вологість ґрунту (%);Освітленість (lux)\n";
+
+            // 3. Наповнюємо даними
+            lastHistoryData.forEach(row => {
+                const date = new Date(row.timestamp).toLocaleString('uk-UA');
+                
+                // Форматуємо рядок: використовуємо ; між значеннями
+                // Також замінюємо крапку в числах на кому, якщо твій Excel налаштований на українські стандарти
+                const temp = row.temperature.toFixed(2).replace('.', ',');
+                const hum = row.humidity.toFixed(2).replace('.', ',');
+                const soil = Math.round(row.soil_moisture);
+                const light = Math.round(row.light_lux);
+
+                csvContent += `${date};${temp};${hum};${soil};${light}\n`;
+            });
+
+            // 4. Створюємо файл
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            const url = URL.createObjectURL(blob);
+            
+            link.setAttribute("href", url);
+            link.setAttribute("download", `zvit_teplytsia_${new Date().toLocaleDateString()}.csv`);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        });
+
+        loadHistory();
+        setInterval(loadHistory, 30000); 
+    </script>
+</body>
+</html>
