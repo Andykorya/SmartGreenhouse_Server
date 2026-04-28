@@ -1,6 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const axios = require('axios'); // Бібліотека для запитів у Telegram
 
 const app = express();
 
@@ -11,6 +12,28 @@ app.use(express.json());
 const PORT = 5000;
 // Підключення до хмари Atlas
 const MONGO_URI = 'mongodb+srv://andy:Z26x10c1980@cluster0.bufmcs6.mongodb.net/SmartGreenhouseDB?retryWrites=true&w=majority';
+
+// ==========================================
+// ⚠️ НАЛАШТУВАННЯ TELEGRAM БОТА
+// ==========================================
+const TELEGRAM_TOKEN = '8631812028:AAGQ0A3KqUjoAPBhdGRYBAdSfpNh0oduyAs'; 
+const CHAT_ID = '511637428'; 
+
+// Функція для відправки повідомлень
+async function sendTelegramAlert(message) {
+    const url = `https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`;
+    try {
+        await axios.post(url, {
+            chat_id: CHAT_ID,
+            text: message,
+            parse_mode: 'HTML' 
+        });
+        console.log("📲 Сповіщення в Telegram відправлено!");
+    } catch (error) {
+        console.error("❌ Помилка Telegram:", error.message);
+    }
+}
+// ==========================================
 
 // --- ПІДКЛЮЧЕННЯ ---
 mongoose.connect(MONGO_URI)
@@ -57,11 +80,22 @@ app.get('/api/telemetry/latest', async (req, res) => {
     }
 });
 
-// 3. Зберегти нові дані (від ESP32)
+// 3. Зберегти нові дані (від ESP32) + TELEGRAM АЛЕРТ
 app.post('/api/telemetry', async (req, res) => {
     try {
         const newEntry = new Telemetry(req.body);
         await newEntry.save();
+
+        // Читаємо показники, які прийшли від плати
+        const temp = req.body.temperature;
+        const soil = req.body.soil_moisture;
+
+        // ПЕРЕВІРКА КРИТИЧНИХ МЕЖ
+        if (temp < 15 || temp > 35 || soil < 30) {
+            const alertMessage = `🚨 <b>УВАГА! АВАРІЯ МІКРОКЛІМАТУ!</b>\n\n🌡 Температура: <b>${temp}°C</b>\n🪴 Вологість ґрунту: <b>${soil}%</b>\n\nНегайно перевірте систему!`;
+            sendTelegramAlert(alertMessage);
+        }
+
         res.status(201).json({ message: "Збережено!", data: newEntry });
     } catch (error) {
         res.status(400).json({ message: "Помилка запису", error });

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Розумна теплиця</title>
+    <title>Головне меню | AgriTech System</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌱</text></svg>">
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
@@ -11,151 +11,35 @@
 <body>
 
     <header>
-        <h1>🌱 Розумна теплиця</h1>
-        <div class="live-badge"><span class="dot"></span> Система онлайн</div>
+        <h1>🌱 Комплекс теплиць</h1>
+        <div class="live-badge"><span class="dot"></span> 3 об'єкти в мережі</div>
     </header>
 
     <main>
-        <div class="dashboard" id="dashboard">
-            <div class="card" id="card-temp">
-                <div class="icon">🌡️</div>
-                <div class="card-title">Температура повітря</div>
-                <div class="card-value" id="val_temp">--<span class="unit">°C</span></div>
-            </div>
-            <div class="card" id="card-hum">
-                <div class="icon">💧</div>
-                <div class="card-title">Вологість повітря</div>
-                <div class="card-value" id="val_hum">--<span class="unit">%</span></div>
-            </div>
-            <div class="card" id="card-soil">
-                <div class="icon">🪴</div>
-                <div class="card-title">Вологість ґрунту</div>
-                <div class="card-value" id="val_soil">--<span class="unit">%</span></div>
-            </div>
-            <div class="card" id="card-light">
-                <div class="icon">☀️</div>
-                <div class="card-title">Освітленість</div>
-                <div class="card-value" id="val_light">--<span class="unit">lux</span></div>
-            </div>
-        </div>
-
-        <div class="controls-panel">
-            <h3>Керування провітрюванням</h3>
+        <div class="menu-container">
+            <a href="greenhouse.html?id=1" class="menu-card">
+                <div class="menu-icon">🍅</div>
+                <div class="menu-title">Теплиця 1</div>
+                <div class="menu-desc">Помідори чері</div>
+            </a>
             
-            <button class="btn btn-auto active" id="btn-auto">Авто-режим</button>
-            
-            <hr style="margin: 20px 0; border: 0; border-top: 1px solid #eee;">
+            <a href="greenhouse.html?id=2" class="menu-card">
+                <div class="menu-icon">🥒</div>
+                <div class="menu-title">Теплиця 2</div>
+                <div class="menu-desc">Огірки тепличні</div>
+            </a>
 
-            <div class="switch-container disabled-ui" id="manual-controls">
-                <span class="switch-label" id="label-close">Закрито</span>
-                <label class="switch">
-                    <input type="checkbox" id="door-toggle">
-                    <span class="slider"></span>
-                </label>
-                <span class="switch-label" id="label-open">Відкрито</span>
-            </div>
-
-            <br>
-            <a href="history.html" class="btn btn-history">📊 Відкрити графіки та історію</a>
+            <a href="greenhouse.html?id=3" class="menu-card">
+                <div class="menu-icon">🥬</div>
+                <div class="menu-title">Теплиця 3</div>
+                <div class="menu-desc">Салат (зелень)</div>
+            </a>
         </div>
     </main>
 
     <footer>
-        <div class="timestamp" id="last_update">Очікування даних...</div>
+        <div class="timestamp">Система управління мікрокліматом</div>
     </footer>
 
-    <script>
-        const btnAuto = document.getElementById('btn-auto');
-        const manualControls = document.getElementById('manual-controls');
-        const doorToggle = document.getElementById('door-toggle');
-        const labelOpen = document.getElementById('label-open');
-        const labelClose = document.getElementById('label-close');
-
-        // 1. Блимання карток при тривозі
-        function checkAlert(cardId, value, min, max = Infinity) {
-            const card = document.getElementById(cardId);
-            if (value !== '--' && (value < min || value > max)) {
-                card.classList.add('alert');
-            } else {
-                card.classList.remove('alert');
-            }
-        }
-
-        // 2. Відправка команд
-        async function sendCommand(mode, command) {
-            try {
-                await fetch('http://localhost:5000/api/command', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ mode, command })
-                });
-            } catch (error) {
-                console.error('Помилка команди:', error);
-            }
-        }
-
-        // 3. Оновлення цифр
-        async function fetchTelemetry() {
-            try {
-                const response = await fetch('http://localhost:5000/api/telemetry/latest');
-                if (!response.ok) throw new Error("Помилка мережі");
-                const data = await response.json();
-
-                const temp = data.temperature !== undefined ? parseFloat(data.temperature).toFixed(1) : '--';
-                const hum = data.humidity !== undefined ? parseFloat(data.humidity).toFixed(1) : '--';
-                const soil = data.soil_moisture !== undefined ? data.soil_moisture : '--';
-                const light = data.light_lux !== undefined ? Math.round(data.light_lux) : '--';
-
-                document.getElementById('val_temp').innerHTML = `${temp}<span class="unit">°C</span>`;
-                document.getElementById('val_hum').innerHTML = `${hum}<span class="unit">%</span>`;
-                document.getElementById('val_soil').innerHTML = `${soil}<span class="unit">%</span>`;
-                document.getElementById('val_light').innerHTML = `${light}<span class="unit">lux</span>`;
-
-                checkAlert('card-temp', temp, 15, 30);
-                checkAlert('card-hum', hum, 40, 95);
-                checkAlert('card-soil', soil, 30);
-                checkAlert('card-light', light, 50);
-
-                const date = new Date(data.timestamp);
-                document.getElementById('last_update').innerText = `Останнє оновлення: ${date.toLocaleTimeString('uk-UA')}`;
-            } catch (e) { console.error(e); }
-        }
-
-        // --- ЛОГІКА КЕРУВАННЯ ---
-
-        // Перехід в АВТО
-        btnAuto.addEventListener('click', () => {
-            btnAuto.classList.add('active');
-            manualControls.classList.add('disabled-ui'); 
-            
-            labelOpen.classList.remove('active');
-            labelClose.classList.remove('active');
-            
-            // В авто-режимі ESP32 сама закриє/відкриє за температурою
-            sendCommand("auto", "close"); 
-        });
-
-        // Взаємодія з ТУМБЛЕРОМ (Ручний режим)
-        doorToggle.addEventListener('change', () => {
-            // Як тільки рухнули тумблер — вимикаємо Авто
-            btnAuto.classList.remove('active');
-            manualControls.classList.remove('disabled-ui');
-
-            const isOpened = doorToggle.checked;
-            
-            if (isOpened) {
-                labelOpen.classList.add('active');
-                labelClose.classList.remove('active');
-                sendCommand("manual", "open");
-            } else {
-                labelOpen.classList.remove('active');
-                labelClose.classList.add('active');
-                sendCommand("manual", "close");
-            }
-        });
-
-        fetchTelemetry();
-        setInterval(fetchTelemetry, 5000);
-    </script>
 </body>
 </html>

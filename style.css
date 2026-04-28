@@ -24,7 +24,7 @@ body {
 }
 
 /* =========================================
-   СТИЛІ ГОЛОВНОЇ СТОРІНКИ (index.html)
+   ЗАГАЛЬНІ ЕЛЕМЕНТИ (Хедер, бейджі)
    ========================================= */
 header { text-align: center; flex-shrink: 0; }
 h1 { font-size: 2.5rem; color: #14532d; margin-bottom: 15px; }
@@ -52,6 +52,38 @@ main {
     align-items: center; width: 100%; padding: 40px 0;
 }
 
+/* =========================================
+   ГОЛОВНЕ МЕНЮ (Вибір теплиці)
+   ========================================= */
+.menu-container {
+    display: flex; flex-direction: column; gap: 20px;
+    width: 100%; max-width: 900px; margin: 20px auto;
+}
+
+@media (min-width: 768px) {
+    .menu-container { flex-direction: row; justify-content: center; }
+}
+
+.menu-card {
+    flex: 1; background: var(--card-bg); border-radius: 20px;
+    padding: 40px 20px; text-align: center; text-decoration: none;
+    color: var(--text-main); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+    transition: all 0.3s ease; border: 2px solid transparent;
+}
+
+.menu-card:hover {
+    transform: translateY(-8px); box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);
+    border-color: var(--accent);
+}
+
+.menu-icon { font-size: 4rem; margin-bottom: 20px; }
+.menu-title { font-size: 1.5rem; font-weight: 800; margin-bottom: 10px; }
+.menu-desc { color: var(--text-muted); font-size: 1rem; font-weight: 600; }
+
+
+/* =========================================
+   ДАШБОРД (Картки датчиків)
+   ========================================= */
 .dashboard {
     display: grid; gap: 20px; width: 100%; max-width: 1200px;
     grid-template-columns: 1fr; margin-bottom: 40px;
@@ -83,169 +115,63 @@ main {
 .card.alert { animation: flashAlert 1.5s infinite; }
 .card.alert .card-value { color: var(--danger); }
 
-/* Панель керування */
+
+/* =========================================
+   ПАНЕЛЬ КЕРУВАННЯ ТА ТУМБЛЕР
+   ========================================= */
 .controls-panel {
     background: white; padding: 20px 40px; border-radius: 20px;
     box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); text-align: center;
     margin-bottom: 20px; width: 100%; max-width: 600px;
 }
 .controls-panel h3 { margin-bottom: 15px; color: var(--text-main); }
+
 .btn {
     padding: 10px 24px; border: none; border-radius: 12px;
     font-size: 1rem; font-weight: 600; cursor: pointer; transition: 0.2s;
-    margin: 0 5px; font-family: 'Nunito', sans-serif;
+    margin: 0 5px; font-family: 'Nunito', sans-serif; text-decoration: none; display: inline-block;
 }
 .btn-auto { background: #e2e8f0; color: var(--text-main); }
 .btn-auto.active { background: var(--accent); color: white; }
-.btn-open { background: #e2e8f0; color: var(--text-main); }
-.btn-open.active { background: #3b82f6; color: white; }
-.btn-history {
-    background: #1e293b; color: white; margin-top: 15px; width: 100%;
-    text-decoration: none; display: inline-block; padding: 12px; border-radius: 12px;
-}
+.btn-history { background: #1e293b; color: white; margin-top: 15px; width: 100%; padding: 12px; }
 .btn-history:hover { background: #334155; }
+
+/* Тумблер */
+.switch-container { display: flex; align-items: center; justify-content: center; gap: 15px; margin-top: 10px; }
+.switch-label { font-weight: 600; color: var(--text-muted); transition: color 0.3s; }
+.switch-label.active { color: var(--text-main); }
+.switch { position: relative; display: inline-block; width: 60px; height: 34px; }
+.switch input { opacity: 0; width: 0; height: 0; }
+.slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 34px; }
+.slider:before { position: absolute; content: ""; height: 26px; width: 26px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
+input:checked + .slider { background-color: #3b82f6; }
+input:checked + .slider:before { transform: translateX(26px); }
+
+/* Вимкнений стан тумблера */
+.disabled-ui { opacity: 0.4; filter: grayscale(1); cursor: pointer; }
 
 footer { text-align: center; flex-shrink: 0; padding-top: 20px; }
 .timestamp { display: inline-block; color: var(--text-muted); font-size: 0.95rem; background: white; padding: 10px 20px; border-radius: 30px; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
 
 
 /* =========================================
-   СТИЛІ СТОРІНКИ ІСТОРІЇ (history.html)
+   СТОРІНКА ІСТОРІЇ ТА ГРАФІКІВ (history.html)
    ========================================= */
-.header-history {
-    display: flex; flex-direction: column; align-items: center; margin-bottom: 30px;
-}
+.header-history { display: flex; flex-direction: column; align-items: center; margin-bottom: 30px; }
+.btn-back { background: var(--text-muted); color: white; text-decoration: none; padding: 10px 24px; border-radius: 30px; font-weight: 600; margin-bottom: 20px; transition: all 0.3s ease; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+.btn-back:hover { background: var(--text-main); transform: translateY(-2px); box-shadow: 0 6px 12px rgba(0,0,0,0.1); }
 
-.btn-back {
-    background: var(--text-muted); color: white; text-decoration: none;
-    padding: 10px 24px; border-radius: 30px; font-weight: 600;
-    margin-bottom: 20px; transition: all 0.3s ease; box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-}
-.btn-back:hover {
-    background: var(--text-main); transform: translateY(-2px); box-shadow: 0 6px 12px rgba(0,0,0,0.1);
-}
-
-.averages-panel {
-    display: flex; justify-content: space-around; flex-wrap: wrap;
-    background: var(--card-bg); padding: 25px; border-radius: 20px;
-    margin-bottom: 30px; width: 100%; max-width: 1200px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
-}
-
+.averages-panel { display: flex; justify-content: space-around; flex-wrap: wrap; background: var(--card-bg); padding: 25px; border-radius: 20px; margin-bottom: 30px; width: 100%; max-width: 1200px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
 .avg-item { text-align: center; margin: 10px 20px; }
-.avg-label {
-    color: var(--text-muted); font-size: 0.95rem; font-weight: 600;
-    text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px;
-}
+.avg-label { color: var(--text-muted); font-size: 0.95rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px; }
 .avg-val { font-size: 2rem; font-weight: 800; color: var(--text-main); }
 
-.charts-container {
-    display: grid; gap: 25px; width: 100%; max-width: 1200px;
-    grid-template-columns: 1fr; margin-bottom: 40px;
-}
+.charts-container { display: grid; gap: 25px; width: 100%; max-width: 1200px; grid-template-columns: 1fr; margin-bottom: 40px; }
 @media (min-width: 800px) { .charts-container { grid-template-columns: repeat(2, 1fr); } }
+.chart-card { background: var(--card-bg); border-radius: 20px; padding: 25px 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); position: relative; height: 350px; }
 
-.chart-card {
-    background: var(--card-bg); border-radius: 20px; padding: 25px 20px;
-    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); position: relative; height: 350px;
-}
+.loading-text { text-align: center; color: var(--text-muted); font-weight: 600; padding: 40px; }
 
-.loading-text {
-    text-align: center; color: var(--text-muted); font-weight: 600; padding: 40px;
-}
-
-.btn-download {
-    background: #0ea5e9; /* Гарний блакитний колір */
-    color: white;
-    text-decoration: none;
-    padding: 12px 24px;
-    border-radius: 12px;
-    font-weight: 700;
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    border: none;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    margin-top: 20px;
-    box-shadow: 0 4px 6px rgba(14, 165, 233, 0.2);
-}
-
-.btn-download:hover {
-    background: #0284c7;
-    transform: translateY(-2px);
-    box-shadow: 0 6px 12px rgba(14, 165, 233, 0.3);
-}
-
-.footer-actions {
-    width: 100%;
-    max-width: 1200px;
-    display: flex;
-    justify-content: center;
-    margin-bottom: 40px;
-}
-
-/* --- СТИЛІ ТУМБЛЕРА (TOGGLE) --- */
-.switch-container {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 15px;
-    margin-top: 10px;
-}
-
-.switch-label {
-    font-weight: 600;
-    color: var(--text-muted);
-    transition: color 0.3s;
-}
-
-.switch-label.active {
-    color: var(--text-main);
-}
-
-.switch {
-    position: relative;
-    display: inline-block;
-    width: 60px;
-    height: 34px;
-}
-
-.switch input { 
-    opacity: 0;
-    width: 0;
-    height: 0;
-}
-
-.slider {
-    position: absolute;
-    cursor: pointer;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background-color: #ccc;
-    transition: .4s;
-    border-radius: 34px;
-}
-
-.slider:before {
-    position: absolute;
-    content: "";
-    height: 26px; width: 26px;
-    left: 4px; bottom: 4px;
-    background-color: white;
-    transition: .4s;
-    border-radius: 50%;
-}
-
-input:checked + .slider {
-    background-color: #3b82f6; /* Синій колір для "Відкрито" */
-}
-
-input:checked + .slider:before {
-    transform: translateX(26px);
-}
-
-/* Стан "вимкнено" для всієї панелі */
-.disabled-ui {
-    opacity: 0.4;
-    filter: grayscale(1); /* Робимо все сірим */
-    cursor: pointer;
-}
+.btn-download { background: #0ea5e9; color: white; text-decoration: none; padding: 12px 24px; border-radius: 12px; font-weight: 700; display: inline-flex; align-items: center; gap: 10px; border: none; cursor: pointer; transition: all 0.3s ease; margin-top: 20px; box-shadow: 0 4px 6px rgba(14, 165, 233, 0.2); }
+.btn-download:hover { background: #0284c7; transform: translateY(-2px); box-shadow: 0 6px 12px rgba(14, 165, 233, 0.3); }
+.footer-actions { width: 100%; max-width: 1200px; display: flex; justify-content: center; margin-bottom: 40px; }
