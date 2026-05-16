@@ -24,6 +24,78 @@ body {
 }
 
 /* =========================================
+   НОВИЙ ФОН ДЛЯ ГОЛОВНОЇ СТОРІНКИ (index.html)
+   Професійний ефект локального розмиття
+   ========================================= */
+
+/* Крок 1: Готуємо тіло головної сторінки */
+body.home-page {
+    position: relative; /* Необхідно для позиціонування фону ::before */
+    background-image: none !important; /* Гарантуємо, що старий фон видалений */
+    min-height: 100vh; /* Мінімум 100% висота екрану */
+    overflow-x: hidden; /* Запобігаємо скролу від масштабування фону */
+}
+
+/* Крок 2: Робимо текст на головній сторінці білим для читабельності */
+body.home-page .main-title {
+    color: #ffffff;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+    position: relative; /* z-index спрацює тільки так */
+    z-index: 2; /* Піднімаємо вміст над фоном */
+}
+
+/* Корегуємо стиль підвалу на головній */
+body.home-page footer {
+    background: transparent !important;
+    position: relative;
+    z-index: 2; /* Піднімаємо вміст над фоном */
+}
+
+body.home-page footer .timestamp {
+    background: rgba(255,255,255,0.2); /* Дуже світлий прозорий фон */
+    color: #ffffff; /* Білий текст підвалу */
+    backdrop-filter: blur(5px);
+}
+
+/* Крок 3: Створюємо невидимий pseudo-елемент перед тілом (::before)
+   Він буде нести на собі заблюрене фото */
+body.home-page::before {
+    content: ''; /* Обов'язково */
+    
+    /* Розтягуємо pseudo-елемент на весь екран */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    
+    /* Додаємо фон: затемнюючий градієнт + твоє фото локально */
+    background-image: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.5)), url('bg.jpg');
+    
+    /* =========================================
+       МАГІЯ АДАПТИВНОСТІ: підлаштується під будь-яку задачу
+       ========================================= */
+    background-size: cover; /* ГАРАНТУЄ: заповнить весь екран, не обріжеться дивно, не розтягнеться */
+    background-position: center; /* Центрує зображення */
+    background-repeat: no-repeat; /* Не повторюється */
+    
+    /* РОЗМИТТЯ: заблюрить тільки фотографію */
+    filter: blur(10px); /* Сила розмиття (px) — налаштуй за смаком (зазвичай 8-12) */
+    
+    /* Опускаємо pseudo-елемент під вміст тіла (текст та картки) */
+    z-index: 1;
+    
+    /* Трохи масштабуємо заблюрений фон, щоб приховати білі краї від blur */
+    transform: scale(1.1);
+}
+
+/* Також піднімаємо картки меню, щоб вони були над фоном */
+body.home-page .menu-container {
+    position: relative;
+    z-index: 2;
+}
+
+/* =========================================
    ЗАГАЛЬНІ ЕЛЕМЕНТИ (Хедер, бейджі)
    ========================================= */
 header { text-align: center; flex-shrink: 0; }
@@ -33,6 +105,8 @@ h1 { font-size: 2.5rem; color: #14532d; margin-bottom: 15px; }
     display: inline-flex; align-items: center; background: #dcfce7;
     color: #15803d; padding: 6px 16px; border-radius: 20px;
     font-weight: 600; font-size: 0.9rem; box-shadow: 0 2px 10px rgba(34, 197, 94, 0.2);
+    position: relative;
+    z-index: 2;
 }
 
 .dot {
@@ -53,33 +127,68 @@ main {
 }
 
 /* =========================================
-   ГОЛОВНЕ МЕНЮ (Вибір теплиці)
+   ГОЛОВНЕ МЕНЮ (Вибір теплиці з ефектом Glassmorphism)
    ========================================= */
 .menu-container {
     display: flex; flex-direction: column; gap: 20px;
-    width: 100%; max-width: 900px; margin: 20px auto;
+    width: 100%; max-width: 1000px; margin: 20px auto;
 }
 
-@media (min-width: 768px) {
+@media (min-width: 800px) {
     .menu-container { flex-direction: row; justify-content: center; }
 }
 
 .menu-card {
-    flex: 1; background: var(--card-bg); border-radius: 20px;
-    padding: 40px 20px; text-align: center; text-decoration: none;
-    color: var(--text-main); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
-    transition: all 0.3s ease; border: 2px solid transparent;
+    flex: 1; 
+    background: rgba(255, 255, 255, 0.9); /* Ефект напівпрозорості */
+    backdrop-filter: blur(10px); /* Розмиття фону під карткою */
+    border-radius: 20px;
+    padding: 30px 20px; 
+    text-align: center; 
+    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+    transition: all 0.3s ease; 
+    border: 2px solid rgba(255, 255, 255, 0.5);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 }
 
 .menu-card:hover {
-    transform: translateY(-8px); box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);
+    transform: translateY(-8px); 
+    box-shadow: 0 20px 30px rgba(0,0,0,0.3);
     border-color: var(--accent);
 }
 
-.menu-icon { font-size: 4rem; margin-bottom: 20px; }
-.menu-title { font-size: 1.5rem; font-weight: 800; margin-bottom: 10px; }
-.menu-desc { color: var(--text-muted); font-size: 1rem; font-weight: 600; }
+.card-link-wrapper {
+    text-decoration: none;
+    color: var(--text-main);
+    display: block;
+    margin-bottom: 25px;
+}
 
+.menu-icon { font-size: 4rem; margin-bottom: 20px; }
+.menu-title { font-size: 1.4rem; font-weight: 800; margin-bottom: 10px; line-height: 1.3;}
+.menu-desc { color: var(--text-muted); font-size: 0.95rem; font-weight: 600; }
+
+/* Дизайн кнопки локації (Google Maps) */
+.location-link {
+    display: inline-block;
+    padding: 10px 15px;
+    background: rgba(34, 197, 94, 0.1);
+    color: #15803d;
+    text-decoration: none;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+}
+
+.location-link:hover {
+    background: var(--accent);
+    color: #ffffff;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(34, 197, 94, 0.3);
+}
 
 /* =========================================
    ДАШБОРД (Картки датчиків)
@@ -147,7 +256,7 @@ main {
 input:checked + .slider { background-color: #3b82f6; }
 input:checked + .slider:before { transform: translateX(26px); }
 
-/* Вимкнений стан тумблера */
+
 .disabled-ui { opacity: 0.4; filter: grayscale(1); cursor: pointer; }
 
 footer { text-align: center; flex-shrink: 0; padding-top: 20px; }
@@ -155,7 +264,7 @@ footer { text-align: center; flex-shrink: 0; padding-top: 20px; }
 
 
 /* =========================================
-   СТОРІНКА ІСТОРІЇ ТА ГРАФІКІВ (history.html)
+   СТОРІНКА ІСТОРІЇ ТА ГРАФІКІВ
    ========================================= */
 .header-history { display: flex; flex-direction: column; align-items: center; margin-bottom: 30px; }
 .btn-back { background: var(--text-muted); color: white; text-decoration: none; padding: 10px 24px; border-radius: 30px; font-weight: 600; margin-bottom: 20px; transition: all 0.3s ease; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
